@@ -31,11 +31,10 @@ class TestCase(object):
     def run_test(self):
         cmd = [
             f"fio {self.config_file_path}",
-            '--output-format=json',
-            f"--output={self.result_file_path}",
             f"--write_bw_log={self.file_prefix}",
             f"--write_lat_log={self.file_prefix}",
             f"--write_iops_log={self.file_prefix}",
+            "--status-interval=1 --minimal"
         ]
         print(" ".join(cmd))
         os.system(" ".join(cmd))

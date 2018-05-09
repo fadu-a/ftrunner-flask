@@ -1,0 +1,8 @@
+ioengine=libaio
+direct=1
+invalidate=1
+norandommap=1
+randrepeat=0
+group_reporting=1
+log_avg_msec=1000
+thread=1

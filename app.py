@@ -2,6 +2,7 @@ import platform
 from flask import Flask, request, jsonify
 
 from utils.runner import TestCase
+from utils.scenario import Scenario
 
 app = Flask(__name__)
 
@@ -23,9 +24,11 @@ def status():
 @app.route('/start', methods=['POST'])
 def start():
     data = request.get_json()
-    testcase = TestCase(data)
-    result = testcase.do_test()
-    return result
+    scenario = Scenario(data)
+
+    scenario.do_test()
+
+    return jsonify(data)
 
 
 if __name__ == '__main__':
