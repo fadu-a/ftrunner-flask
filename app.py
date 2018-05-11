@@ -1,11 +1,12 @@
 import platform
 from flask import Flask, request, jsonify
-
+import threading
 from utils.runner import TestCase
 from utils.scenario import Scenario
+from pusher import Pusher
 
 app = Flask(__name__)
-
+#socketio = SocketIO(app)
 
 @app.route('/')
 def welcome():
@@ -20,15 +21,15 @@ def status():
         version=platform.version()
     )
 
-
 @app.route('/start', methods=['POST'])
 def start():
     data = request.get_json()
     scenario = Scenario(data)
-
-    scenario.do_test()
+    result = scenario.do_test()
 
     return jsonify(data)
+    # startT = threading.Thread(target=scenario.do_test(), args=())
+    # startT.daemon = True
 
 
 if __name__ == '__main__':

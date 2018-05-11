@@ -2,6 +2,13 @@ import csv
 import datetime
 import json
 import os
+import subprocess
+from subprocess import Popen, PIPE
+import time
+import threading
+from flask import request, Flask, Response, redirect, url_for
+import app
+import httplib2
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RESULTS_DIR = os.path.join(BASE_DIR, "results")
@@ -37,15 +44,35 @@ class Scenario(object):
             self.job_files.append(file_path)
 
     def run_test(self):
+        global fio_process, fio_thread
+
         for job_file in self.job_files:
             cmd = [
-                f"fio {job_file}",
-                "--status-interval=1 --minimal"
+                "fio",
+                f"{job_file}",
+                "--status-interval=1",
+                "--minimal"
             ]
-            print(" ".join(cmd))
-            os.system(" ".join(cmd))
+            fio_process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True, preexec_fn=os.setpgrp)
+            fio_thread = threading.Thread(target=self.read_test_log(), args=())
+            fio_thread.start()
+        print("kjy")
+
+    def read_test_log(self):
+        #h = httplib2.Http()
+        while fio_process.poll() == None:
+            std_line = fio_process.stdout.readline()
+            print (std_line)
+        #return Response(self.read_test_log())
+
+
+
+
 
     def do_test(self):
         self.create_job_files()
         self.run_test()
+
+
+
 

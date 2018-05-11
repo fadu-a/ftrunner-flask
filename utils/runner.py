@@ -1,7 +1,7 @@
 import csv
 import datetime
 import json
-import os
+import os, sys
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RESULTS_DIR = os.path.join(BASE_DIR, "results")
@@ -34,7 +34,6 @@ class TestCase(object):
             f"--write_bw_log={self.file_prefix}",
             f"--write_lat_log={self.file_prefix}",
             f"--write_iops_log={self.file_prefix}",
-            "--status-interval=1 --minimal"
         ]
         print(" ".join(cmd))
         os.system(" ".join(cmd))
