@@ -1,12 +1,34 @@
 import platform
 from flask import Flask, request, jsonify
-import threading
+from celery import Celery
+
+import settings
 from utils.runner import TestCase
 from utils.scenario import Scenario
-from pusher import Pusher
 
 app = Flask(__name__)
-#socketio = SocketIO(app)
+app.config.from_object(settings)
+
+def make_celery(app):
+    celery = Celery(app.import_name, broker=app.config['CELERY_BROKER_URL'])
+    celery.conf.update(app.config)
+    TaskBase = celery.Task
+    class ContextTask(TaskBase):
+        abstract = True
+        def __call__(self, *args, **kwargs):
+            with app.app_context():
+                return TaskBase.__call__(self, *args, **kwargs)
+    celery.Task = ContextTask
+    return celery
+
+
+celery = make_celery(app)
+
+
+@celery.task(name="tasks.start_fio_test")
+def start_fio_test(data):
+    scenario = Scenario(data)
+    scenario.do_test()
 
 @app.route('/')
 def welcome():
@@ -24,8 +46,8 @@ def status():
 @app.route('/start', methods=['POST'])
 def start():
     data = request.get_json()
-    scenario = Scenario(data)
-    result = scenario.do_test()
+    # scenario = Scenario(data)
+    result = start_fio_test.delay(data)
 
     return jsonify(data)
     # startT = threading.Thread(target=scenario.do_test(), args=())

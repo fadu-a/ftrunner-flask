@@ -7,8 +7,8 @@ from subprocess import Popen, PIPE
 import time
 import threading
 from flask import request, Flask, Response, redirect, url_for
+import requests
 import app
-import httplib2
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RESULTS_DIR = os.path.join(BASE_DIR, "results")
@@ -55,14 +55,19 @@ class Scenario(object):
             ]
             fio_process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True, preexec_fn=os.setpgrp)
             fio_thread = threading.Thread(target=self.read_test_log(), args=())
+            fio_thread.daemon = True
             fio_thread.start()
         print("kjy")
 
     def read_test_log(self):
         #h = httplib2.Http()
+        print("Test")
         while fio_process.poll() == None:
             std_line = fio_process.stdout.readline()
-            print (std_line)
+            print(std_line)
+            r = requests.get('http://localhost:5000/')
+            print(r.text)
+
         #return Response(self.read_test_log())
 
 
