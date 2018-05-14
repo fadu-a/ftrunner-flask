@@ -1,0 +1,5 @@
+[global]
+include /home/jykim/ftrunner-flask/results/configs/global-throughput.fio
+
+[job1]
+description=[32] 1_128KSeqWR_QD128TC1

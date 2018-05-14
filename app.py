@@ -51,6 +51,8 @@ def start():
     scenario = Scenario(data)
     result = start_fio_test.delay(data)
 
+    print(data)
+
     return jsonify(message="start fio")
     # startT = threading.Thread(target=scenario.do_test(), args=())
     # startT.daemon = True

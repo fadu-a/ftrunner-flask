@@ -1,0 +1,11 @@
+[global]
+include /home/jykim/ftrunner-flask/results/configs/global-throughput.fio
+
+[job1]
+description=[85] 1_128KSeqWR_QD128TC1
+iodepth=128
+numjobs=1
+runtime=5000
+filename=nvme0n1
+blocksize=128K
+readwrite=write
