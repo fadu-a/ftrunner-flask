@@ -60,18 +60,21 @@ class Scenario(object):
         print("kjy")
 
     def read_test_log(self):
-        #h = httplib2.Http()
         print("Test")
         while fio_process.poll() == None:
             std_line = fio_process.stdout.readline()
             print(std_line)
-            r = requests.get('http://localhost:5000/')
-            print(r.text)
-
-        #return Response(self.read_test_log())
-
-
-
+            rt = requests.get('http://192.168.0.28:8000/api/fio/results')
+            rt.status_code
+            rt.text
+            if std_line is None:
+                fio_status = {'status': '2'}
+                r = requests.post('http://192.168.0.28:8000/api/fio/results',data=fio_status)
+                r.text
+            re = requests.post('http://192.168.0.28:8000/api/fio/results',data=std_line)
+            re.text
+            re.status_code
+            print(re.text)
 
 
     def do_test(self):

@@ -1,13 +1,14 @@
 import platform
 from flask import Flask, request, jsonify
 from celery import Celery
-
+import requests
 import settings
 from utils.runner import TestCase
 from utils.scenario import Scenario
 
 app = Flask(__name__)
 app.config.from_object(settings)
+
 
 def make_celery(app):
     celery = Celery(app.import_name, broker=app.config['CELERY_BROKER_URL'])
@@ -29,6 +30,7 @@ celery = make_celery(app)
 def start_fio_test(data):
     scenario = Scenario(data)
     scenario.do_test()
+    return print(10000)
 
 @app.route('/')
 def welcome():
@@ -46,10 +48,10 @@ def status():
 @app.route('/start', methods=['POST'])
 def start():
     data = request.get_json()
-    # scenario = Scenario(data)
+    scenario = Scenario(data)
     result = start_fio_test.delay(data)
 
-    return jsonify(data)
+    return jsonify(message="start fio")
     # startT = threading.Thread(target=scenario.do_test(), args=())
     # startT.daemon = True
 
