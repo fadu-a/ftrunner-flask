@@ -1,9 +1,7 @@
 import platform
 from flask import Flask, request, jsonify
 from celery import Celery
-import requests
 import settings
-from utils.runner import TestCase
 from utils.scenario import Scenario
 
 app = Flask(__name__)
@@ -30,7 +28,6 @@ celery = make_celery(app)
 def start_fio_test(data):
     scenario = Scenario(data)
     scenario.do_test()
-    return print(10000)
 
 @app.route('/')
 def welcome():
@@ -50,12 +47,8 @@ def start():
     data = request.get_json()
     scenario = Scenario(data)
     result = start_fio_test.delay(data)
-
     print(data)
-
     return jsonify(message="start fio")
-    # startT = threading.Thread(target=scenario.do_test(), args=())
-    # startT.daemon = True
 
 
 if __name__ == '__main__':
