@@ -3,6 +3,7 @@ import os
 import subprocess
 import threading
 import requests
+from operator import itemgetter
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -14,7 +15,8 @@ class Scenario(object):
     def __init__(self, data):
         self.id = data['id']
         self.name = data['name']
-        self.testcases = data['testcases']
+        testcases = data['testcases']
+        self.testcases = sorted(testcases, key=itemgetter('order'))
         self.timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
         self.dirname = os.path.join(RESULTS_DIR, self.timestamp)
         self.job_files = []
@@ -24,6 +26,7 @@ class Scenario(object):
         os.makedirs(self.dirname)
         print(GLOBAL_CONFIGS_DIR)
         for job in self.testcases:
+
             id = job.pop('id')
             name = job.pop('name')
             order = job.pop('order')
@@ -58,20 +61,15 @@ class Scenario(object):
 
     def finish_test(self):
         fio_status = {'status': 1}
-        requests.patch("http://192.168.0.28:8000/api/fio/results/{}/".format(self.id), data=fio_status)
+        requests.patch("http://192.168.0.16:8000/api/fio/results/{}/".format(self.id), data=fio_status)
 
     def read_test_result(self, job_id):
         while fio_process.poll() == None:
             std_line = fio_process.stdout.readline()
             print(std_line)
-            self.give_sec_result(job_id, std_line)
-
-    def give_sec_result(self, job_id , std_line):
-        headers = {'Content-type': 'application/json'}
-        re = requests.put("http://192.168.0.28:8000/api/fio/io_logs/{}/append/".format(job_id), json="{}".format(std_line), headers=headers)
-        re.text
-        re.status_code
-        print(re.text)
+            headers = {'Content-type': 'application/json'}
+            re = requests.put("http://192.168.0.16:8000/api/fio/io_logs/{}/append/".format(job_id), json="{}".format(std_line), headers=headers)
+            print(re.text)
 
     def do_test(self):
         self.create_job_files()
